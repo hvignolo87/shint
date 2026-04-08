@@ -196,6 +196,15 @@ _shint_complete() {
         fi
         # Deduplicate values across groups (keep separator lines)
         suggestions=$(printf '%s\n' "$built" | awk -F'\t' '/^\033\[1;30;43m/ {print; next} !seen[$1]++')
+    elif [[ "$group_count" -eq 1 ]]; then
+        # Single group → use it directly, no separators
+        if $has_hist; then
+            suggestions="$hist_group"
+        elif $has_nonflag; then
+            suggestions="$nonflag_group"
+        elif $has_flags; then
+            suggestions="$flags_group"
+        fi
     fi
 
     [[ -z "$suggestions" ]] && return
