@@ -7,17 +7,18 @@ Press Tab, get an interactive fuzzy picker with documentation for every flag, su
 ```
 $ dbt run --[Tab]
 
-  --defer          Defer to the state variable for resolving unselected nodes
-  --exclude        Specify the models to exclude
-  --fail-fast      Stop execution upon a first failure
-  --full-refresh   Drop incremental models and fully-recalculate
-  --models         Specify the nodes to include
-  --select         Specify the nodes to include
-  --state          Use the given directory as the source for json files to compare
-  --target         Which target to load for the given profile
-  --threads        Specify number of threads to use while executing models
-
-  9/21 flags
+  ┌──────────────────────────────────────────────────────────────┐
+  │          Options                                             │
+  │  --defer          Defer to the state variable for resolving  │
+  │  --exclude        Specify the models to exclude              │
+  │  --fail-fast      Stop execution upon a first failure        │
+  │  --full-refresh   Drop incremental models and fully-recalc.  │
+  │  --select         Specify the nodes to include               │
+  │  --target         Which target to load for the given profile │
+  │  --threads        Specify number of threads to use           │
+  │                                                              │
+  │  9/21                                                        │
+  └──────────────────────────────────────────────────────────────┘
 ```
 
 ## The problem
@@ -28,7 +29,7 @@ Bash's built-in autocomplete shows plain text with no descriptions. You know a f
 
 **shint** replaces bash's Tab completion with an interactive [fzf](https://github.com/junegunn/fzf) picker that shows descriptions alongside every suggestion. It uses [carapace](https://github.com/carapace-sh/carapace-bin) as its data engine, which provides completion specs for 5,900+ commands — including dynamic values like git branches, docker containers, and tox environments.
 
-The entire tool is ~130 lines of bash.
+The entire tool is ~270 lines of bash.
 
 ## Features
 
@@ -37,10 +38,11 @@ The entire tool is ~130 lines of bash.
 - **Dynamic values** — git branches (with commit messages), docker containers, tox envs, npm scripts, ssh hosts
 - **Fuzzy search** — type any part of a flag name to filter instantly
 - **Smart level advancement** — type `dbt run` and Tab shows flags, not subcommand matches
-- **Subcommands + flags merged** — see both available subcommands and global flags in one list
+- **Grouped sections** — subcommands, options, current directory files, and recent directories are visually separated with styled headers
+- **History-based directory suggestions** — for path-oriented commands (`cd`, `ls`, `cp`, `mv`, `rm`, etc.), shows directories from your entire bash history ranked by recency
+- **Alias support** — aliases like `l` → `ls` are resolved automatically, so completions and directory suggestions work on aliases too
 - **Single-result auto-insert** — if there's only one match, it completes directly without opening the picker
 - **Zero config** — works immediately after installation
-- **~130 lines of bash** — no Python, no Node, no compilation
 
 ## Requirements
 
@@ -143,6 +145,33 @@ $ git pus[Tab]   → completes directly to "git push " (no picker)
 $ dbt run --[Tab]  → picker opens → type "sel" → filters to --select, --selector
 ```
 
+**History-based directory suggestions:**
+
+For path-oriented commands (`cd`, `ls`, `cp`, `mv`, `rm`, `vim`, `cat`, `touch`, etc.), shint adds directories from your bash history to the picker:
+
+```
+$ cd [Tab]        → shows recent directories from your history
+$ ls .vsc[Tab]    → shows all .vscode directories you've ever visited
+$ cp [Tab]        → shows flags + current directory + recent directories
+```
+
+Results are grouped with visual separators:
+
+```
+  ┌──────────────────────────────────────────────┐
+  │       Options          --recursive, etc.      │
+  │    Current directory   files in cwd           │
+  │   Recent directories   paths from history     │
+  └──────────────────────────────────────────────┘
+```
+
+**Alias support:**
+
+```
+$ alias l='ls -lha'
+$ l [Tab]         → resolves alias, shows ls flags + directories
+```
+
 Press **Esc** to cancel without changing anything.
 
 ## Configuration
@@ -172,6 +201,7 @@ Tab press
 │  bash (bind -x)              │
 │  Captures READLINE_LINE      │
 │  Tokenizes the command line  │
+│  Resolves aliases            │
 └──────────────┬───────────────┘
                │
                ▼
@@ -184,9 +214,18 @@ Tab press
                │
                ▼
 ┌──────────────────────────────┐
+│  bash history + cwd          │
+│  Extracts directory paths    │
+│  from ~/.bash_history        │
+│  (for path-oriented cmds)    │
+└──────────────┬───────────────┘
+               │
+               ▼
+┌──────────────────────────────┐
 │  fzf (interactive picker)    │
 │  Fuzzy search on values      │
-│  Descriptions shown inline   │
+│  Grouped sections with       │
+│  styled separators           │
 │  Returns: selected value     │
 └──────────────┬───────────────┘
                │
@@ -204,10 +243,13 @@ Tab press
 - **Carapace fish format**: Calls `carapace <cmd> fish <tokens>` which outputs tab-separated `value\tdescription` pairs — trivially parseable and ideal for fzf.
 - **Flag merging**: When completing a new argument, shint fetches both positional completions and available flags, merging them into a single list.
 - **Level advancement**: If the current token exactly matches a known subcommand, shint automatically advances to show the next level (flags/arguments) instead of offering to complete the already-typed subcommand.
+- **Grouped display**: Suggestions are split into groups (subcommands/files, flags, history directories) with ANSI-colored separator bars. Only shown when there are multiple groups.
+- **Alias resolution**: Aliases are resolved to their underlying command so carapace can provide accurate completions and path-oriented command detection works on aliases.
+- **History directories**: Paths are extracted from `~/.bash_history` using awk for bulk text processing, then validated and normalized via `cd && pwd`. Relative paths are resolved from the current directory.
 
 ## Acknowledgments
 
-shint is a ~130-line bash script that stands on the shoulders of two excellent projects:
+shint stands on the shoulders of two excellent projects:
 
 - **[carapace-bin](https://github.com/carapace-sh/carapace-bin)** by [@rsteube](https://github.com/rsteube) — the completion engine with 5,900+ command specs. shint would not exist without it.
 - **[fzf](https://github.com/junegunn/fzf)** by [@junegunn](https://github.com/junegunn) — the interactive fuzzy finder that powers the picker UI.
