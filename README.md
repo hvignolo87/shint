@@ -4,7 +4,7 @@
 
 Press Tab, get an interactive fuzzy picker with documentation for every flag, subcommand, and argument. Works with 5,900+ commands out of the box.
 
-```
+```bash
 $ dbt run --[Tab]
 
   ┌──────────────────────────────────────────────────────────────┐
@@ -102,77 +102,81 @@ Just press **Tab** as you normally would. shint intercepts Tab for all commands 
 
 **See subcommands with descriptions:**
 
-```
-$ git [Tab]         → shows all git subcommands with descriptions
-$ kubectl [Tab]     → shows kubectl subcommands
-$ dbt [Tab]         → shows dbt subcommands (run, test, build, seed...)
+```bash
+git [Tab]         → shows all git subcommands with descriptions
+kubectl [Tab]     → shows kubectl subcommands
+dbt [Tab]         → shows dbt subcommands (run, test, build, seed...)
 ```
 
 **See flags with documentation:**
 
-```
-$ git push --[Tab]  → shows --force, --set-upstream, --dry-run, etc.
-$ dbt run --[Tab]   → shows --defer, --select, --full-refresh, etc.
-$ curl --[Tab]      → shows all 200+ curl flags with descriptions
+```bash
+git push --[Tab]  → shows --force, --set-upstream, --dry-run, etc.
+dbt run --[Tab]   → shows --defer, --select, --full-refresh, etc.
+curl --[Tab]      → shows all 200+ curl flags with descriptions
 ```
 
 **Complete dynamic values:**
 
-```
-$ git checkout [Tab]  → shows branches with last commit message
-$ git push -u [Tab]   → shows remotes
-$ docker exec [Tab]   → shows running containers
-$ tox -e [Tab]        → shows available tox environments
-$ ssh [Tab]           → shows hosts from ~/.ssh/config
+```bash
+git checkout [Tab]  → shows branches with last commit message
+git push -u [Tab]   → shows remotes
+docker exec [Tab]   → shows running containers
+tox -e [Tab]        → shows available tox environments
+ssh [Tab]           → shows hosts from ~/.ssh/config
 ```
 
 **Smart level advancement:**
 
-```
-$ dbt run[Tab]   → shows flags for "dbt run" (not subcommand matches)
-$ git push[Tab]  → shows flags for "git push"
+```bash
+dbt run[Tab]   → shows flags for "dbt run" (not subcommand matches)
+git push[Tab]  → shows flags for "git push"
 ```
 
 **Single match auto-completes:**
 
-```
-$ git pus[Tab]   → completes directly to "git push " (no picker)
+```bash
+git pus[Tab]   → completes directly to "git push " (no picker)
 ```
 
 **Fuzzy search in the picker:**
 
-```
-$ dbt run --[Tab]  → picker opens → type "sel" → filters to --select, --selector
+```bash
+dbt run --[Tab]  → picker opens → type "sel" → filters to --select, --selector
 ```
 
 **History-based directory suggestions:**
 
 For path-oriented commands (`cd`, `ls`, `cp`, `mv`, `rm`, `vim`, `cat`, `touch`, etc.), shint adds directories from your bash history to the picker:
 
-```
-$ cd [Tab]        → shows recent directories from your history
-$ ls .vsc[Tab]    → shows all .vscode directories you've ever visited
-$ cp [Tab]        → shows flags + current directory + recent directories
+```bash
+cd [Tab]        → shows recent directories from your history
+ls .vsc[Tab]    → shows all .vscode directories you've ever visited
+cp [Tab]        → shows flags + current directory + recent directories
 ```
 
 Results are grouped with visual separators:
 
-```
+```text
   ┌──────────────────────────────────────────────┐
-  │       Options          --recursive, etc.      │
-  │    Current directory   files in cwd           │
-  │   Recent directories   paths from history     │
+  │       Options          --recursive, etc.     │
+  │    Current directory   files in cwd          │
+  │   Recent directories   paths from history    │
   └──────────────────────────────────────────────┘
 ```
 
 **Alias support:**
 
-```
-$ alias l='ls -lha'
-$ l [Tab]         → resolves alias, shows ls flags + directories
+```bash
+alias l='ls -lha'
+l [Tab]         → resolves alias, shows ls flags + directories
 ```
 
 Press **Esc** to cancel without changing anything.
+
+### Preview
+
+<img src="artifacts/shint_preview.webp" alt="Shint Preview" style="align:center">
 
 ## Configuration
 
@@ -193,7 +197,7 @@ source "$HOME/.shint/shint.bash"
 
 shint is a thin bridge between three components:
 
-```
+```text
 Tab press
     │
     ▼
